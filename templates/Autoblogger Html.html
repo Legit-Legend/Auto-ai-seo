@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Article Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #001f3f;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            background-color: #003366;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            width: 100%;
+        }
+        .sidebar {
+            background-color: #00264d;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .content {
+            text-align: center;
+        }
+        h1, h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 22px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        input[type="text"], input[type="url"], input[type="range"], textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #word_count_value {
+            font-weight: bold;
+        }
+        #result {
+            margin-top: 20px;
+            background-color: #00264d;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            max-width: 100%;
+            overflow-x: auto;
+            text-align: left;
+        }
+        .step {
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        .step.completed {
+            color: #4CAF50;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Progress</h2>
+            <div id="progress">
+                <div class="step" id="step1">Step 1: Enter keyword</div>
+                <div class="step" id="step2">Step 2: Enter URLs</div>
+                <div class="step" id="step3">Generate outline</div>
+                <div class="step" id="step4">Generate article</div>
+            </div>
+        </div>
+        <div class="content">
+            <h1>SEO Article Generator</h1>
+            <form id="articleForm" method="POST" action="/generate">
+                <label for="keyword">Target Keyword:</label>
+                <input type="text" id="keyword" name="keyword" required><br>
+
+                <label for="word_count">Desired Word Count: <span id="word_count_value">1000</span></label>
+                <input type="range" id="word_count" name="word_count" min="500" max="5000" value="1000" oninput="document.getElementById('word_count_value').textContent = this.value"><br>
+
+                <label for="custom_instructions">Custom Instructions:</label>
+                <textarea id="custom_instructions" name="custom_instructions" rows="4"></textarea><br>
+
+                <label for="url1">Article URL 1:</label>
+                <input type="url" id="url1" name="urls" required><br>
+
+                <label for="url2">Article URL 2:</label>
+                <input type="url" id="url2" name="urls" required><br>
+
+                <label for="url3">Article URL 3:</label>
+                <input type="url" id="url3" name="urls" required><br>
+
+                <button type="submit">Generate Article</button>
+            </form>
+
+            <div id="result">
+                <h2>Generated Article</h2>
+                <pre id="articleOutput"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('articleForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            // Reset steps
+            document.getElementById('step1').classList.remove('completed');
+            document.getElementById('step2').classList.remove('completed');
+            document.getElementById('step3').classList.remove('completed');
+            document.getElementById('step4').classList.remove('completed');
+
+            const formData = new FormData(event.target);
+
+            // Show progress
+            document.getElementById('step1').classList.add('completed');
+
+            setTimeout(() => {
+                document.getElementById('step2').classList.add('completed');
+            }, 1000);
+
+            const response = await fetch('/generate', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            document.getElementById('articleOutput').textContent = result.article_markdown;
+
+            // Show completion
+            document.getElementById('step3').classList.add('completed');
+            setTimeout(() => {
+                document.getElementById('step4').classList.add('completed');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
